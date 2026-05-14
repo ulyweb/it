@@ -3,7 +3,7 @@
 ![Version](https://img.shields.io/badge/Version-V7-gold?style=flat-square)
 ![PowerShell](https://img.shields.io/badge/PowerShell-5.1%2B-blue?style=flat-square)
 ![Platform](https://img.shields.io/badge/Platform-Windows%2011-0078D6?style=flat-square)
-![License](https://img.shields.io/badge/License-Internal-lightgrey?style=flat-square)
+
 
 > A comprehensive, all-in-one PowerShell diagnostic dashboard for IT support teams. Captures Windows 11 endpoint telemetry, event logs, resource anomalies, and session snapshots — then generates Copilot-ready prompts for AI-assisted root cause analysis, safe self-healing, and Ticketing-ready documentation.
 
