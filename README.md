@@ -38,7 +38,7 @@
 - **Hibernate Status & Enable Action** — Detect and enable hibernate directly from the dashboard
 - **Device Removal Action** — Remove non-OK devices from Device Manager via the UI
 - **Day-by-Day Capture Reports** — Historical CSV matrix + offline HTML dashboard with event counts, context, and expanded details
-- **Copilot Diagnostic Prompts (V6)** — Two automated copy-ready prompts: Root Cause + Safe Self-Healing, and ServiceNow/User Communication
+- **Copilot Diagnostic Prompts (V6)** — Two automated copy-ready prompts: Root Cause + Safe Self-Healing, and Ticketing/User Communication
 - **Dynamic Persona Gating (V7)** — Auto-enables Zoom, Network, Thermal, and Outlook diagnostic modules only when evidence is present
 - **Visual HTML Report Generator (Prompt 3)** — Converts Copilot analysis into an interactive, animated, self-contained HTML report
 - **Agent Builder Blueprint** — Complete package for creating a dedicated IT_HealthCheck agent in Microsoft 365 Copilot Agent Builder or Copilot Studio
@@ -135,7 +135,7 @@ Follow these 5 steps **before** generating the capture report to maximize diagno
 | Prompt | Name | Time | Difficulty | Description |
 |:---:|---|:---:|:---:|---|
 | **1** | Root Cause + Safe Self-Healing | ~3 min | ⭐ Easy | Analyzes the full report, identifies confirmed findings vs. likely causes, recommends safe built-in Windows recovery steps, labels admin-only actions, and provides escalation criteria. Includes dynamic persona modules (Zoom, Network, Thermal, Outlook) auto-enabled by evidence. |
-| **2** | ServiceNow + User Communication | ~2 min | ⭐ Easy | Generates ITSM-ready ticket documentation with category, subject, business impact, work notes (9 fields), status, and a polished non-technical user-facing message. |
+| **2** | Ticketing + User Communication | ~2 min | ⭐ Easy | Generates ITSM-ready ticket documentation with category, subject, business impact, work notes (9 fields), status, and a polished non-technical user-facing message. |
 | **3** | Convert to Visual HTML Report | ~5 min | ⭐⭐ Medium | Follow-up prompt in the **same** Copilot conversation after Prompt 1. Converts the full analysis into an interactive, animated, self-contained HTML file with landing overlay, resource tiles, event badges, and diagnostic cards. |
 
 ### Prerequisites
@@ -202,7 +202,7 @@ Follow these 5 steps **before** generating the capture report to maximize diagno
 | Tool | Purpose | Output |
 |---|---|---|
 | **Prompt 1** | Root cause + safe self-healing | Copilot analysis text |
-| **Prompt 2** | ServiceNow ticket + user message | ITSM-ready documentation |
+| **Prompt 2** | Ticketing ticket + user message | ITSM-ready documentation |
 | **Prompt 3** | Visual HTML diagnostic report | Self-contained `.html` file |
 | **Prompt 4** | Driver/update/boot audit | Copilot analysis text |
 | **Prompt 5** | Disk & storage SMART analysis | Copilot analysis text |
@@ -218,7 +218,7 @@ Follow these 5 steps **before** generating the capture report to maximize diagno
 |---|---|
 | **Evidence-First** | Never claim a root cause without supporting evidence from the report. Separate confirmed findings from likely causes. |
 | **Safe Before Destructive** | Recommend built-in Windows tools and reversible actions first. Label admin-only steps clearly. Never recommend OS reset, profile rebuild, registry edits, or driver removal unless evidence supports it. |
-| **Audit-Ready** | All output is professional, concise, and suitable for ServiceNow tickets, escalation notes, and compliance reviews. |
+| **Audit-Ready** | All output is professional, concise, and suitable for Ticketing tickets, escalation notes, and compliance reviews. |
 | **Business Continuity** | Prioritize user productivity and data safety. Minimize disruption during troubleshooting. |
 
 ### Safe Remediation Model
