@@ -1,0 +1,1058 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Win11 Maintenance Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0c10;
+    --surface: #0f1117;
+    --panel: #141720;
+    --border: #1e2535;
+    --border-glow: #2a3a5c;
+    --accent: #00c8ff;
+    --accent2: #7c3aed;
+    --accent3: #10b981;
+    --warn: #f59e0b;
+    --danger: #ef4444;
+    --text: #e2e8f0;
+    --muted: #64748b;
+    --dim: #334155;
+    --success-glow: rgba(16,185,129,0.15);
+    --accent-glow: rgba(0,200,255,0.12);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Animated grid background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,200,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,200,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  #app { position: relative; z-index: 1; max-width: 1400px; margin: 0 auto; padding: 24px; }
+
+  /* Header */
+  header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 20px 28px;
+    background: linear-gradient(135deg, #0f1117 0%, #141c2b 100%);
+    border: 1px solid var(--border);
+    border-bottom: 1px solid var(--accent);
+    border-radius: 12px 12px 0 0;
+    margin-bottom: 0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  header::after {
+    content: '';
+    position: absolute; bottom: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent), var(--accent2), transparent);
+    animation: scanline 3s linear infinite;
+  }
+
+  @keyframes scanline {
+    0% { opacity: 0.4; transform: scaleX(0.3); }
+    50% { opacity: 1; transform: scaleX(1); }
+    100% { opacity: 0.4; transform: scaleX(0.3); }
+  }
+
+  .header-left { display: flex; align-items: center; gap: 16px; }
+
+  .logo-icon {
+    width: 44px; height: 44px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+    box-shadow: 0 0 20px rgba(0,200,255,0.3);
+    animation: pulse-glow 3s ease-in-out infinite;
+  }
+
+  @keyframes pulse-glow {
+    0%, 100% { box-shadow: 0 0 20px rgba(0,200,255,0.3); }
+    50% { box-shadow: 0 0 35px rgba(0,200,255,0.6), 0 0 60px rgba(124,58,237,0.2); }
+  }
+
+  h1 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 20px; font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 2px;
+    text-shadow: 0 0 20px rgba(0,200,255,0.5);
+  }
+
+  .subtitle { font-size: 11px; color: var(--muted); letter-spacing: 1px; margin-top: 2px; }
+
+  .status-bar {
+    display: flex; gap: 16px; align-items: center;
+  }
+
+  .status-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--accent3);
+    box-shadow: 0 0 8px var(--accent3);
+    animation: blink 2s ease-in-out infinite;
+  }
+
+  .status-dot.offline { background: var(--danger); box-shadow: 0 0 8px var(--danger); }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  .clock {
+    font-size: 12px; color: var(--muted); letter-spacing: 1px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* Main layout */
+  .main-grid {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 0;
+    border: 1px solid var(--border);
+    border-top: none;
+    border-radius: 0 0 12px 12px;
+    overflow: hidden;
+    min-height: calc(100vh - 140px);
+  }
+
+  /* Sidebar */
+  .sidebar {
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex; flex-direction: column;
+  }
+
+  .sidebar-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    font-size: 10px; font-weight: 600;
+    color: var(--muted); letter-spacing: 2px; text-transform: uppercase;
+  }
+
+  .sidebar-section { padding: 10px 12px; }
+
+  .section-label {
+    font-size: 9px; color: var(--dim); letter-spacing: 2px;
+    text-transform: uppercase; padding: 8px 8px 4px;
+    font-weight: 600;
+  }
+
+  .cmd-btn {
+    display: flex; align-items: center; gap: 10px;
+    width: 100%; padding: 10px 12px;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    cursor: pointer;
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    text-align: left;
+    transition: all 0.15s ease;
+    margin-bottom: 2px;
+    position: relative;
+  }
+
+  .cmd-btn:hover {
+    background: rgba(0,200,255,0.06);
+    border-color: rgba(0,200,255,0.2);
+    color: var(--accent);
+  }
+
+  .cmd-btn.active {
+    background: rgba(0,200,255,0.1);
+    border-color: var(--accent);
+    color: var(--accent);
+    box-shadow: 0 0 12px rgba(0,200,255,0.1);
+  }
+
+  .cmd-btn.running {
+    background: rgba(0,200,255,0.08);
+    border-color: var(--accent);
+    animation: running-pulse 1.5s ease-in-out infinite;
+  }
+
+  @keyframes running-pulse {
+    0%, 100% { box-shadow: 0 0 0 rgba(0,200,255,0); }
+    50% { box-shadow: 0 0 16px rgba(0,200,255,0.25); }
+  }
+
+  .cmd-icon {
+    font-size: 15px; width: 20px; text-align: center; flex-shrink: 0;
+  }
+
+  .cmd-info { flex: 1; }
+  .cmd-name { font-size: 12px; font-weight: 500; }
+  .cmd-meta { font-size: 10px; color: var(--muted); margin-top: 1px; }
+
+  .badge {
+    font-size: 9px; padding: 2px 6px;
+    border-radius: 4px; letter-spacing: 0.5px; font-weight: 600;
+    flex-shrink: 0;
+  }
+
+  .badge-admin { background: rgba(245,158,11,0.15); color: var(--warn); border: 1px solid rgba(245,158,11,0.3); }
+  .badge-reboot { background: rgba(239,68,68,0.15); color: var(--danger); border: 1px solid rgba(239,68,68,0.3); }
+  .badge-ok { background: rgba(16,185,129,0.12); color: var(--accent3); border: 1px solid rgba(16,185,129,0.3); }
+
+  /* Run all button */
+  .run-all-btn {
+    margin: 12px;
+    padding: 12px;
+    background: linear-gradient(135deg, rgba(0,200,255,0.1), rgba(124,58,237,0.1));
+    border: 1px solid rgba(0,200,255,0.3);
+    border-radius: 8px;
+    color: var(--accent);
+    font-family: 'Orbitron', sans-serif;
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 1.5px;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: all 0.2s;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+
+  .run-all-btn:hover {
+    background: linear-gradient(135deg, rgba(0,200,255,0.2), rgba(124,58,237,0.2));
+    box-shadow: 0 0 20px rgba(0,200,255,0.2);
+  }
+
+  .run-all-btn:disabled {
+    opacity: 0.4; cursor: not-allowed;
+  }
+
+  /* Content area */
+  .content { background: var(--panel); display: flex; flex-direction: column; }
+
+  /* Task bar tabs */
+  .tab-bar {
+    display: flex; align-items: center; gap: 4px;
+    padding: 12px 16px 0;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    overflow-x: auto;
+  }
+
+  .tab {
+    padding: 8px 14px;
+    border: 1px solid transparent;
+    border-bottom: none;
+    border-radius: 6px 6px 0 0;
+    font-size: 11px; cursor: pointer;
+    color: var(--muted);
+    background: transparent;
+    font-family: 'JetBrains Mono', monospace;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+
+  .tab:hover { color: var(--text); background: rgba(255,255,255,0.04); }
+
+  .tab.active {
+    color: var(--accent);
+    background: var(--panel);
+    border-color: var(--border);
+    border-bottom-color: var(--panel);
+    margin-bottom: -1px;
+    z-index: 1;
+  }
+
+  /* Terminal output */
+  .terminal {
+    flex: 1; padding: 20px;
+    overflow-y: auto;
+    font-size: 12px;
+    line-height: 1.7;
+    min-height: 400px;
+    max-height: calc(100vh - 320px);
+  }
+
+  .terminal-empty {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    height: 100%; min-height: 300px;
+    gap: 16px; color: var(--dim);
+  }
+
+  .terminal-empty .big-icon { font-size: 48px; opacity: 0.4; }
+
+  .terminal-empty p { font-size: 13px; letter-spacing: 1px; }
+
+  .line { display: flex; gap: 8px; align-items: flex-start; margin-bottom: 2px; animation: fadeIn 0.2s ease; }
+
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(2px); } to { opacity: 1; transform: none; } }
+
+  .line-prefix {
+    font-size: 10px; opacity: 0.5; flex-shrink: 0; padding-top: 1px;
+    min-width: 60px; text-align: right;
+  }
+
+  .line-text { flex: 1; word-break: break-all; }
+
+  .line.type-start .line-text { color: var(--accent); font-weight: 600; font-size: 13px; }
+  .line.type-step .line-text { color: #a78bfa; }
+  .line.type-cmd { background: rgba(0,0,0,0.3); border-radius: 4px; padding: 3px 8px; margin: 4px 0; }
+  .line.type-cmd .line-text { color: #fbbf24; }
+  .line.type-cmd .line-prefix { display: none; }
+  .line.type-output .line-text { color: #94a3b8; }
+  .line.type-success .line-text { color: var(--accent3); }
+  .line.type-warning .line-text { color: var(--warn); }
+  .line.type-error .line-text { color: var(--danger); }
+  .line.type-info .line-text { color: #60a5fa; }
+  .line.type-reboot .line-text { color: var(--danger); font-weight: 600; }
+  .line.type-done .line-text { color: var(--accent3); font-weight: 600; border-top: 1px solid var(--border); padding-top: 8px; margin-top: 4px; }
+
+  /* Spinner */
+  .spinner {
+    display: inline-block; width: 12px; height: 12px;
+    border: 2px solid rgba(0,200,255,0.2);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    vertical-align: middle; margin-right: 6px;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Bottom controls */
+  .bottom-bar {
+    padding: 12px 20px;
+    border-top: 1px solid var(--border);
+    background: var(--surface);
+    display: flex; gap: 10px; align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .action-btn {
+    padding: 8px 16px;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; cursor: pointer;
+    transition: all 0.15s;
+    display: flex; align-items: center; gap: 6px;
+  }
+
+  .action-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(0,200,255,0.06);
+  }
+
+  .action-btn.primary {
+    background: linear-gradient(135deg, rgba(0,200,255,0.15), rgba(124,58,237,0.15));
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .action-btn.danger { border-color: rgba(239,68,68,0.4); color: var(--danger); }
+  .action-btn.danger:hover { background: rgba(239,68,68,0.08); }
+
+  .action-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+  .spacer { flex: 1; }
+
+  /* Progress bar */
+  .progress-wrap {
+    padding: 0 20px 12px;
+    background: var(--surface);
+  }
+
+  .progress-bar-outer {
+    height: 3px; background: var(--border); border-radius: 2px; overflow: hidden;
+  }
+
+  .progress-bar-inner {
+    height: 100%; width: 0%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 2px;
+    transition: width 0.4s ease;
+    position: relative;
+  }
+
+  .progress-bar-inner::after {
+    content: '';
+    position: absolute; right: 0; top: 0; bottom: 0;
+    width: 60px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6));
+    animation: shimmer 1.5s ease-in-out infinite;
+  }
+
+  @keyframes shimmer {
+    0%, 100% { opacity: 0; }
+    50% { opacity: 1; }
+  }
+
+  /* Tasklist tab */
+  .task-panel { padding: 16px; }
+
+  .task-search {
+    width: 100%; padding: 8px 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    margin-bottom: 12px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  .task-search:focus { border-color: var(--accent); }
+  .task-search::placeholder { color: var(--dim); }
+
+  .task-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+  .task-table th {
+    text-align: left; padding: 8px 10px;
+    color: var(--muted); font-size: 10px; letter-spacing: 1px;
+    border-bottom: 1px solid var(--border);
+    font-weight: 600; text-transform: uppercase;
+    position: sticky; top: 0; background: var(--panel);
+  }
+
+  .task-table td { padding: 6px 10px; border-bottom: 1px solid rgba(30,37,53,0.5); }
+  .task-table tr:hover td { background: rgba(0,200,255,0.04); }
+
+  .kill-btn {
+    padding: 3px 8px;
+    background: rgba(239,68,68,0.1);
+    border: 1px solid rgba(239,68,68,0.3);
+    border-radius: 4px; color: var(--danger);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .kill-btn:hover { background: rgba(239,68,68,0.2); }
+
+  .pid-col { color: #60a5fa; }
+  .mem-col { color: var(--muted); }
+  .name-col { color: var(--text); }
+
+  /* Run all overlay */
+  .run-all-queue {
+    padding: 12px 20px;
+    background: rgba(0,200,255,0.04);
+    border-bottom: 1px solid var(--border);
+    display: none;
+  }
+
+  .run-all-queue.visible { display: block; }
+
+  .queue-title { font-size: 10px; color: var(--muted); letter-spacing: 1.5px; margin-bottom: 8px; }
+
+  .queue-items { display: flex; flex-wrap: wrap; gap: 6px; }
+
+  .queue-item {
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 10px;
+    background: var(--border);
+    color: var(--muted);
+    border: 1px solid var(--border);
+    display: flex; align-items: center; gap: 4px;
+  }
+
+  .queue-item.done { background: rgba(16,185,129,0.1); color: var(--accent3); border-color: rgba(16,185,129,0.3); }
+  .queue-item.running { background: rgba(0,200,255,0.1); color: var(--accent); border-color: rgba(0,200,255,0.4); }
+  .queue-item.pending { opacity: 0.5; }
+
+  /* Notification toast */
+  #toast {
+    position: fixed; bottom: 28px; right: 28px;
+    padding: 12px 20px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 12px;
+    display: none;
+    animation: slideUp 0.3s ease;
+    z-index: 1000;
+    max-width: 320px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  }
+
+  #toast.visible { display: block; }
+  #toast.success { border-color: var(--accent3); color: var(--accent3); }
+  #toast.warning { border-color: var(--warn); color: var(--warn); }
+  #toast.info { border-color: var(--accent); color: var(--accent); }
+
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: none; }
+  }
+
+  /* Reboot confirm */
+  .reboot-notice {
+    margin: 0 20px 12px;
+    padding: 10px 14px;
+    background: rgba(239,68,68,0.08);
+    border: 1px solid rgba(239,68,68,0.3);
+    border-radius: 6px;
+    display: none;
+    align-items: center; gap: 10px;
+    font-size: 12px; color: var(--danger);
+  }
+
+  .reboot-notice.visible { display: flex; }
+
+  .reboot-notice button {
+    margin-left: auto;
+    padding: 5px 12px;
+    background: rgba(239,68,68,0.15);
+    border: 1px solid var(--danger);
+    border-radius: 5px;
+    color: var(--danger);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .reboot-notice button:hover { background: rgba(239,68,68,0.25); }
+
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--dim); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <div class="header-left">
+      <div class="logo-icon">🛡️</div>
+      <div>
+        <h1>SYS-MAINT</h1>
+        <div class="subtitle">WINDOWS 11 MAINTENANCE CONSOLE v1.0</div>
+      </div>
+    </div>
+    <div class="status-bar">
+      <div class="status-dot" id="status-dot"></div>
+      <span id="status-text" style="font-size:11px;color:var(--muted)">Connecting...</span>
+      <div class="clock" id="clock">--:--:--</div>
+    </div>
+  </header>
+
+  <div class="main-grid">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">⚡ MAINTENANCE COMMANDS</div>
+
+      <div class="sidebar-section">
+        <div class="section-label">🔄 System</div>
+
+        <button class="cmd-btn" data-cmd="winget" onclick="selectCmd('winget')">
+          <span class="cmd-icon">📦</span>
+          <div class="cmd-info">
+            <div class="cmd-name">Windows Update</div>
+            <div class="cmd-meta">winget upgrade --all</div>
+          </div>
+          <span class="badge badge-admin">ADMIN</span>
+        </button>
+
+        <button class="cmd-btn" data-cmd="sfc" onclick="selectCmd('sfc')">
+          <span class="cmd-icon">🔍</span>
+          <div class="cmd-info">
+            <div class="cmd-name">System File Check</div>
+            <div class="cmd-meta">sfc /scannow</div>
+          </div>
+          <span class="badge badge-admin">ADMIN</span>
+        </button>
+
+        <button class="cmd-btn" data-cmd="dism" onclick="selectCmd('dism')">
+          <span class="cmd-icon">🏥</span>
+          <div class="cmd-info">
+            <div class="cmd-name">DISM Repair</div>
+            <div class="cmd-meta">Cleanup-Image /RestoreHealth</div>
+          </div>
+          <span class="badge badge-admin">ADMIN</span>
+        </button>
+
+        <button class="cmd-btn" data-cmd="chkdsk" onclick="selectCmd('chkdsk')">
+          <span class="cmd-icon">💾</span>
+          <div class="cmd-info">
+            <div class="cmd-name">Check Disk</div>
+            <div class="cmd-meta">chkdsk /r</div>
+          </div>
+          <span class="badge badge-reboot">REBOOT</span>
+        </button>
+
+        <div class="section-label">🌐 Network</div>
+
+        <button class="cmd-btn" data-cmd="dns" onclick="selectCmd('dns')">
+          <span class="cmd-icon">🔄</span>
+          <div class="cmd-info">
+            <div class="cmd-name">Flush DNS / Renew IP</div>
+            <div class="cmd-meta">ipconfig /flushdns + renew</div>
+          </div>
+          <span class="badge badge-admin">ADMIN</span>
+        </button>
+
+        <button class="cmd-btn" data-cmd="network" onclick="selectCmd('network')">
+          <span class="cmd-icon">🔌</span>
+          <div class="cmd-info">
+            <div class="cmd-name">Network Stack Reset</div>
+            <div class="cmd-meta">netsh winsock/ip/tcp reset</div>
+          </div>
+          <span class="badge badge-reboot">REBOOT</span>
+        </button>
+
+        <div class="section-label">📊 Diagnostics</div>
+
+        <button class="cmd-btn" data-cmd="disk_health" onclick="selectCmd('disk_health')">
+          <span class="cmd-icon">🖥️</span>
+          <div class="cmd-info">
+            <div class="cmd-name">Disk Health</div>
+            <div class="cmd-meta">Get-PhysicalDisk</div>
+          </div>
+          <span class="badge badge-ok">SAFE</span>
+        </button>
+
+        <button class="cmd-btn" data-cmd="tasklist" onclick="selectCmd('tasklist')">
+          <span class="cmd-icon">📋</span>
+          <div class="cmd-info">
+            <div class="cmd-name">Task Manager</div>
+            <div class="cmd-meta">tasklist + kill</div>
+          </div>
+          <span class="badge badge-ok">SAFE</span>
+        </button>
+
+        <button class="cmd-btn" data-cmd="powercfg" onclick="selectCmd('powercfg')">
+          <span class="cmd-icon">⚡</span>
+          <div class="cmd-info">
+            <div class="cmd-name">Power Report</div>
+            <div class="cmd-meta">powercfg /energy</div>
+          </div>
+          <span class="badge badge-admin">ADMIN</span>
+        </button>
+
+        <button class="cmd-btn" data-cmd="mdsched" onclick="selectCmd('mdsched')">
+          <span class="cmd-icon">🧪</span>
+          <div class="cmd-info">
+            <div class="cmd-name">Memory Diagnostic</div>
+            <div class="cmd-meta">mdsched</div>
+          </div>
+          <span class="badge badge-reboot">REBOOT</span>
+        </button>
+      </div>
+
+      <div style="flex:1"></div>
+
+      <button class="run-all-btn" id="run-all-btn" onclick="runAll()">
+        ▶ RUN ALL COMMANDS
+      </button>
+    </aside>
+
+    <!-- Content -->
+    <main class="content">
+      <!-- Tabs -->
+      <div class="tab-bar">
+        <button class="tab active" id="tab-terminal" onclick="switchTab('terminal')">📟 Terminal</button>
+        <button class="tab" id="tab-tasks" onclick="switchTab('tasks')">📋 Processes</button>
+      </div>
+
+      <!-- Run All Queue -->
+      <div class="run-all-queue" id="queue-panel">
+        <div class="queue-title">QUEUE STATUS</div>
+        <div class="queue-items" id="queue-items"></div>
+      </div>
+
+      <!-- Progress -->
+      <div class="progress-wrap" id="progress-wrap" style="display:none">
+        <div class="progress-bar-outer">
+          <div class="progress-bar-inner" id="progress-bar"></div>
+        </div>
+      </div>
+
+      <!-- Reboot notice -->
+      <div class="reboot-notice" id="reboot-notice">
+        ⟳ This operation requires a reboot to complete.
+        <button onclick="rebootNow()">Reboot Now</button>
+      </div>
+
+      <!-- Terminal Panel -->
+      <div id="panel-terminal" style="display:flex;flex-direction:column;flex:1">
+        <div class="terminal" id="terminal">
+          <div class="terminal-empty" id="terminal-empty">
+            <div class="big-icon">🛡️</div>
+            <p>SELECT A COMMAND TO BEGIN</p>
+            <p style="font-size:11px;opacity:0.5">Choose from the left panel or run all</p>
+          </div>
+        </div>
+
+        <div class="bottom-bar">
+          <button class="action-btn primary" id="run-btn" onclick="runSelected()" disabled>
+            ▶ RUN
+          </button>
+          <button class="action-btn" id="stop-btn" onclick="stopCurrent()" disabled>
+            ⏹ STOP
+          </button>
+          <div class="spacer"></div>
+          <button class="action-btn" onclick="clearTerminal()">🗑 CLEAR</button>
+          <button class="action-btn" onclick="copyOutput()">📋 COPY</button>
+        </div>
+      </div>
+
+      <!-- Task Panel -->
+      <div id="panel-tasks" style="display:none;flex:1;overflow:auto">
+        <div class="task-panel">
+          <input class="task-search" id="task-search" placeholder="Search process name or PID..." oninput="filterTasks()">
+          <div style="overflow:auto;max-height:calc(100vh - 350px)">
+            <table class="task-table">
+              <thead>
+                <tr>
+                  <th>Process Name</th>
+                  <th>PID</th>
+                  <th>Session</th>
+                  <th>Memory</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="task-tbody">
+                <tr><td colspan="5" style="color:var(--muted);text-align:center;padding:20px">Click "Load Processes" to fetch list</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div style="margin-top:12px;display:flex;gap:8px">
+            <button class="action-btn primary" onclick="loadTasks()">🔄 Load Processes</button>
+            <button class="action-btn" onclick="switchTab('terminal')">📟 Back to Terminal</button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const API = 'http://localhost:9191';
+let selectedCmd = null;
+let activeSSE = null;
+let isRunning = false;
+let needsReboot = false;
+let allTasks = [];
+let runAllQueue = [];
+let runAllIndex = 0;
+
+const CMDS_ORDER = ['winget','sfc','dism','chkdsk','dns','network','disk_health','tasklist','powercfg','mdsched'];
+
+// Clock
+setInterval(() => {
+  const now = new Date();
+  document.getElementById('clock').textContent = now.toLocaleTimeString('en-US', {hour12:false});
+}, 1000);
+
+// Status check
+async function checkStatus() {
+  try {
+    const r = await fetch(`${API}/api/status`);
+    if (r.ok) {
+      document.getElementById('status-dot').className = 'status-dot';
+      document.getElementById('status-text').textContent = 'ONLINE';
+    }
+  } catch {
+    document.getElementById('status-dot').className = 'status-dot offline';
+    document.getElementById('status-text').textContent = 'OFFLINE — Run launcher.py';
+  }
+}
+
+checkStatus();
+setInterval(checkStatus, 5000);
+
+function selectCmd(cmd) {
+  selectedCmd = cmd;
+  document.querySelectorAll('.cmd-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector(`[data-cmd="${cmd}"]`).classList.add('active');
+  document.getElementById('run-btn').disabled = isRunning;
+  switchTab('terminal');
+  appendLine('info', `Selected: ${cmd} — press RUN to execute`);
+}
+
+function switchTab(tab) {
+  document.getElementById('panel-terminal').style.display = tab === 'terminal' ? 'flex' : 'none';
+  document.getElementById('panel-tasks').style.display = tab === 'tasks' ? 'block' : 'none';
+  document.getElementById('tab-terminal').className = 'tab' + (tab === 'terminal' ? ' active' : '');
+  document.getElementById('tab-tasks').className = 'tab' + (tab === 'tasks' ? ' active' : '');
+}
+
+function appendLine(type, text) {
+  const empty = document.getElementById('terminal-empty');
+  if (empty) empty.style.display = 'none';
+
+  const term = document.getElementById('terminal');
+  const div = document.createElement('div');
+  div.className = `line type-${type}`;
+
+  const ts = new Date().toLocaleTimeString('en-US', {hour12:false});
+  div.innerHTML = `<span class="line-prefix">${ts}</span><span class="line-text">${escHtml(text)}</span>`;
+
+  if (type === 'start') {
+    const sep = document.createElement('div');
+    sep.style.cssText = 'border-top:1px solid var(--border);margin:12px 0 6px';
+    term.appendChild(sep);
+  }
+
+  term.appendChild(div);
+  term.scrollTop = term.scrollHeight;
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function setRunning(val) {
+  isRunning = val;
+  document.getElementById('run-btn').disabled = val;
+  document.getElementById('stop-btn').disabled = !val;
+  document.getElementById('run-all-btn').disabled = val;
+
+  if (val && selectedCmd) {
+    document.querySelector(`[data-cmd="${selectedCmd}"]`)?.classList.add('running');
+  } else {
+    document.querySelectorAll('.cmd-btn.running').forEach(b => b.classList.remove('running'));
+  }
+
+  const pw = document.getElementById('progress-wrap');
+  pw.style.display = val ? 'block' : 'none';
+  if (val) {
+    const pb = document.getElementById('progress-bar');
+    pb.style.width = '0%';
+    let p = 0;
+    const iv = setInterval(() => {
+      if (!isRunning) { pb.style.width = '100%'; clearInterval(iv); return; }
+      p = Math.min(p + Math.random() * 3, 92);
+      pb.style.width = p + '%';
+    }, 400);
+  }
+}
+
+function runSelected() {
+  if (!selectedCmd || isRunning) return;
+  document.getElementById('reboot-notice').classList.remove('visible');
+  runCmd(selectedCmd);
+}
+
+function runCmd(cmd) {
+  if (isRunning) return;
+  setRunning(true);
+
+  const evtSrc = new EventSource(`${API}/api/run?cmd=${cmd}`);
+  activeSSE = evtSrc;
+
+  evtSrc.onmessage = (e) => {
+    try {
+      const data = JSON.parse(e.data);
+      appendLine(data.type, data.text || ('▶ ' + (data.name || '')));
+      if (data.type === 'reboot') {
+        needsReboot = true;
+        document.getElementById('reboot-notice').classList.add('visible');
+      }
+      if (data.type === 'done') {
+        setRunning(false);
+        evtSrc.close();
+        toast('Command completed', 'success');
+        if (runAllQueue.length > 0) advanceQueue();
+      }
+    } catch(ex) {}
+  };
+
+  evtSrc.onerror = () => {
+    appendLine('error', 'Connection error — is launcher.py running?');
+    setRunning(false);
+    evtSrc.close();
+    if (runAllQueue.length > 0) advanceQueue();
+  };
+}
+
+function stopCurrent() {
+  if (activeSSE) { activeSSE.close(); activeSSE = null; }
+  setRunning(false);
+  appendLine('warning', '⏹ Stopped by user.');
+  runAllQueue = [];
+  document.getElementById('queue-panel').classList.remove('visible');
+}
+
+function runAll() {
+  if (isRunning) return;
+  runAllQueue = [...CMDS_ORDER];
+  runAllIndex = 0;
+  buildQueueUI();
+  appendLine('info', '▶ Starting Run All sequence...');
+  advanceQueue();
+}
+
+function buildQueueUI() {
+  const panel = document.getElementById('queue-panel');
+  const items = document.getElementById('queue-items');
+  panel.classList.add('visible');
+  items.innerHTML = CMDS_ORDER.map(k => {
+    const names = {
+      winget:'Update',sfc:'SFC',dism:'DISM',chkdsk:'ChkDsk',
+      dns:'DNS',network:'Net Reset',disk_health:'Disk',
+      tasklist:'Tasks',powercfg:'Power',mdsched:'Memory'
+    };
+    return `<div class="queue-item pending" id="qi-${k}">${names[k]||k}</div>`;
+  }).join('');
+}
+
+function advanceQueue() {
+  if (runAllQueue.length === 0) {
+    appendLine('success', '✅ All commands completed!');
+    toast('All maintenance tasks done!', 'success');
+    document.getElementById('run-all-btn').disabled = false;
+    return;
+  }
+  const cmd = runAllQueue.shift();
+  runAllIndex++;
+  selectedCmd = cmd;
+  document.querySelectorAll('.cmd-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector(`[data-cmd="${cmd}"]`)?.classList.add('active');
+
+  // Update queue UI
+  document.querySelectorAll('.queue-item.running').forEach(el => {
+    el.className = 'queue-item done'; el.innerHTML = '✓ ' + el.textContent.replace('⠋ ','');
+  });
+  const qi = document.getElementById(`qi-${cmd}`);
+  if (qi) { qi.className = 'queue-item running'; qi.innerHTML = '<span class="spinner"></span>' + qi.textContent; }
+
+  runCmd(cmd);
+}
+
+async function loadTasks() {
+  const tbody = document.getElementById('task-tbody');
+  tbody.innerHTML = '<tr><td colspan="5" style="color:var(--muted);text-align:center;padding:20px"><span class="spinner"></span> Loading...</td></tr>';
+
+  try {
+    const evtSrc = new EventSource(`${API}/api/run?cmd=tasklist`);
+    const lines = [];
+
+    evtSrc.onmessage = (e) => {
+      try {
+        const data = JSON.parse(e.data);
+        if (data.type === 'output') lines.push(data.text);
+        if (data.type === 'done') {
+          evtSrc.close();
+          parseAndRenderTasks(lines);
+        }
+      } catch {}
+    };
+
+    evtSrc.onerror = () => {
+      evtSrc.close();
+      tbody.innerHTML = '<tr><td colspan="5" style="color:var(--danger);padding:12px">Failed to load. Is launcher.py running?</td></tr>';
+    };
+  } catch(err) {
+    tbody.innerHTML = `<tr><td colspan="5" style="color:var(--danger);padding:12px">Error: ${err.message}</td></tr>`;
+  }
+}
+
+function parseAndRenderTasks(lines) {
+  // CSV format from tasklist /FO CSV
+  allTasks = [];
+  for (const line of lines) {
+    if (!line.startsWith('"') || line.startsWith('"Image')) continue;
+    const parts = line.split('","').map(s => s.replace(/^"|"$/g,''));
+    if (parts.length >= 5) {
+      allTasks.push({ name: parts[0], pid: parts[1], session: parts[2], mem: parts[4] });
+    }
+  }
+  renderTasks(allTasks);
+}
+
+function renderTasks(tasks) {
+  const tbody = document.getElementById('task-tbody');
+  if (tasks.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="5" style="color:var(--muted);text-align:center;padding:20px">No processes found</td></tr>';
+    return;
+  }
+  tbody.innerHTML = tasks.map(t => `
+    <tr>
+      <td class="name-col">${escHtml(t.name)}</td>
+      <td class="pid-col">${t.pid}</td>
+      <td style="color:var(--muted)">${t.session}</td>
+      <td class="mem-col">${t.mem}</td>
+      <td><button class="kill-btn" onclick="killPid(${t.pid})">KILL</button></td>
+    </tr>
+  `).join('');
+}
+
+function filterTasks() {
+  const q = document.getElementById('task-search').value.toLowerCase();
+  const filtered = allTasks.filter(t =>
+    t.name.toLowerCase().includes(q) || t.pid.includes(q)
+  );
+  renderTasks(filtered);
+}
+
+function killPid(pid) {
+  if (!confirm(`Kill process PID ${pid}?`)) return;
+  switchTab('terminal');
+
+  const evtSrc = new EventSource(`${API}/api/run?pid=${pid}`);
+  evtSrc.onmessage = (e) => {
+    try {
+      const data = JSON.parse(e.data);
+      appendLine(data.type, data.text || '');
+      if (data.type === 'done') {
+        evtSrc.close();
+        loadTasks();
+        switchTab('tasks');
+      }
+    } catch {}
+  };
+  evtSrc.onerror = () => evtSrc.close();
+}
+
+function clearTerminal() {
+  const term = document.getElementById('terminal');
+  term.innerHTML = '<div class="terminal-empty" id="terminal-empty"><div class="big-icon">🛡️</div><p>SELECT A COMMAND TO BEGIN</p></div>';
+}
+
+function copyOutput() {
+  const lines = document.querySelectorAll('.line .line-text');
+  const text = Array.from(lines).map(l => l.textContent).join('\n');
+  navigator.clipboard.writeText(text).then(() => toast('Output copied to clipboard', 'info'));
+}
+
+function rebootNow() {
+  if (confirm('Reboot Windows now?')) {
+    fetch(`${API}/api/run?cmd=reboot`);
+  }
+}
+
+let toastTimer;
+function toast(msg, type='info') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = `visible ${type}`;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.className = '', 3500);
+}
+</script>
+</body>
+</html>
