@@ -94,7 +94,7 @@ Open **Script Editor** → new document → paste the script below → **File �
 
 set appList to {"/Applications/Safari.app", "/Applications/Google Chrome.app", "/Applications/zoom.us.app", "/Applications/Box.app", "/Applications/Microsoft Outlook.app", "/Applications/Microsoft Word.app", "/Applications/Microsoft Excel.app", "/Applications/Microsoft PowerPoint.app", "/Applications/Self Service.app", "/Applications/Personal Print Manager.app", "/Applications/GlobalProtect.app", "/System/Applications/Utilities/Activity Monitor.app"}
 
-set actionChoice to choose from list {"Apply Full 12-App Standardized Set", "Fully Reset Dock to Factory Defaults"} with title "Standardize Dock" with prompt "Select the Dock action to perform:" default items {"Apply Full 12-App Standardized Set"} without empty selection allowed
+set actionChoice to choose from list {"Core Standard Dock App", "Fully Reset Dock to Factory Defaults"} with title "Standardize Dock" with prompt "Select the Dock action to perform:" default items {"Core Standard Dock App"} without empty selection allowed
 
 if actionChoice is false then
 	-- User clicked Cancel
@@ -110,12 +110,12 @@ if choice is "Core Standard Dock App" then
 		do shell script "defaults write com.apple.dock persistent-apps -array-add '<dict><key>tile-data</key><dict><key>file-data</key><dict><key>_CFURLString</key><string>" & a & "</string><key>_CFURLStringType</key><integer>0</integer></dict></dict></dict>'"
 	end repeat
 	do shell script "killall Dock"
-	display notification "12-app standardized Dock applied." with title "Standardize Corp Dock" subtitle "Complete"
+	display notification "Core Standard Dock App." with title "Core Standard Dock App" subtitle "Complete"
 	
 else if choice is "Fully Reset Mac's Dock to Factory Defaults" then
 	-- Wipe all custom Dock settings; macOS regenerates factory defaults
 	do shell script "defaults delete com.apple.dock; killall Dock"
-	display notification "Dock reset to macOS factory defaults." with title "Standardize Executive Dock" subtitle "Complete"
+	display notification "Dock reset to macOS factory defaults." with title "Standardize Dock" subtitle "Complete"
 end if
 ```
 
