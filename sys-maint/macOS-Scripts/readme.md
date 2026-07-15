@@ -117,5 +117,41 @@ end repeat
 do shell script "killall Dock"
 ```
 
+---
+
+
+Got it — adding **Safari** (`/Applications/Safari.app`) and **Activity Monitor**. ⚠️ Heads-up: on Tahoe 26, Activity Monitor lives under **`/System/Applications/Utilities/`**, *not* `/Applications`, so I've used the correct path below. 👇
+
+## ✅ One-Liner — Full 12-App Set (native `defaults`, clear + rebuild)
+
+```bash
+defaults write com.apple.dock persistent-apps -array; for app in "/Applications/Safari.app" "/Applications/Google Chrome.app" "/Applications/zoom.us.app" "/Applications/Box.app" "/Applications/Microsoft Outlook.app" "/Applications/Microsoft Word.app" "/Applications/Microsoft Excel.app" "/Applications/Microsoft PowerPoint.app" "/Applications/Self Service.app" "/Applications/Personal Print Manager.app" "/Applications/GlobalProtect.app" "/System/Applications/Utilities/Activity Monitor.app"; do defaults write com.apple.dock persistent-apps -array-add "<dict><key>tile-data</key><dict><key>file-data</key><dict><key>_CFURLString</key><string>$app</string><key>_CFURLStringType</key><integer>0</integer></dict></dict></dict>"; done; killall Dock
+```
+
+This empties the Dock's app side, then pins all **12 apps** in order and restarts the Dock so they appear immediately. [\[discussion....apple.com\]](https://discussions.apple.com/thread/254797028), [\[discussion....apple.com\]](https://discussions.apple.com/thread/254332755)
+
+## 📝 Verify Paths First (Activity Monitor is the tricky one)
+
+```bash
+ls -d "/Applications/Safari.app" "/System/Applications/Utilities/Activity Monitor.app"
+```
+
+Key notes:
+
+* **Safari** → `/Applications/Safari.app` ✅ (standard location)
+* **Activity Monitor** → `/System/Applications/Utilities/Activity Monitor.app` — Apple moved system utilities into the read-only System volume, so `/Applications/Utilities/...` will **fail** on modern macOS. The path above is correct for Tahoe 26.
+
+## 🎨 Script Editor Version (clickable "Standardize Executive Dock" app)
+
+Open **Script Editor** → new document → paste → **File → Export → File Format: Application**:
+
+```applescript
+set appList to {"/Applications/Safari.app", "/Applications/Google Chrome.app", "/Applications/zoom.us.app", "/Applications/Box.app", "/Applications/Microsoft Outlook.app", "/Applications/Microsoft Word.app", "/Applications/Microsoft Excel.app", "/Applications/Microsoft PowerPoint.app", "/Applications/Self Service.app", "/Applications/Personal Print Manager.app", "/Applications/GlobalProtect.app", "/System/Applications/Utilities/Activity Monitor.app"}
+do shell script "defaults write com.apple.dock persistent-apps -array"
+repeat with a in appList
+	do shell script "defaults write com.apple.dock persistent-apps -array-add '<dict><key>tile-data</key><dict><key>file-data</key><dict><key>_CFURLString</key><string>" & a & "</string><key>_CFURLStringType</key><integer>0</integer></dict></dict></dict>'"
+end repeat
+do shell script "killall Dock"
+```
 
 
