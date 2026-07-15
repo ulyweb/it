@@ -43,12 +43,12 @@ Key notes:
 * **Zoom** → `zoom.us.app` (lowercase, not "Zoom.app")
 * **Box Drive** → usually `Box.app` (older installs may be `Box Drive.app`)
 * **Microsoft apps** → full name with space, e.g. `Microsoft Outlook.app`
-* **Self Service (Jamf)** → normally `/Applications/Self Service.app` — but some deployments name it `Self Service+.app`
+* **Self Service** → normally `/Applications/Self Service.app` — but some deployments name it `Self Service+.app`
 * **GlobalProtect** → usually `/Applications/GlobalProtect.app` (occasionally lives under a vendor subfolder)
-* **Personal Print Manager (LRS)** → confirm the exact bundle name; sometimes it's `Personal Print Manager.app` and sometimes shortened
+* **Personal Print Manager** → confirm the exact bundle name; sometimes it's `Personal Print Manager.app` and sometimes shortened
 * **Google Chrome** → `Google Chrome.app` (with the space)
 * **Safari** → `/Applications/Safari.app` ✅ (standard location)
-* **Activity Monitor** → `/System/Applications/Utilities/Activity Monitor.app` — Apple moved system utilities into the read-only System volume, so `/Applications/Utilities/...` will **fail** on modern macOS. The path above is correct for Tahoe 26.
+* **Activity Monitor** → `/System/Applications/Utilities/Activity Monitor.app` — Apple moved system utilities into the read-only System volume.
 
 
 ## ✅ One-Liner — Full 12-App Set (native `defaults`, clear + rebuild)
