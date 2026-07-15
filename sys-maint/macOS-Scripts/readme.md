@@ -5,20 +5,25 @@
 
 Chain both arrays in a single command:
 
-````
-Shelldefaults write com.apple.dock persistent-apps -array; defaults write com.apple.dock persistent-others -array; killall DockShow more lines
+````shell
+defaults write com.apple.dock persistent-apps -array; defaults write com.apple.dock persistent-others -array; killall DockShow more lines
 ````
 
 The persistent-others key controls the folders/stacks section on the right of the divider.
 
+### To fully reset the Dock to factory defaults instead (size, magnification, position, and re-populate Apple's default apps), use:
+
+```
+defaults delete com.apple.dock && killall Dock
+```
 
 ### 🎨 Script Editor version (if you prefer a clickable app)
 
 
 Open Script Editor → new document →:
 
-````
-AppleScriptdo shell script "defaults write com.apple.dock persistent-apps -array; defaults write com.apple.dock persistent-others -array; killall Dock"
+````AppleScript
+do shell script "defaults write com.apple.dock persistent-apps -array; defaults write com.apple.dock persistent-others -array; killall Dock"
 ````
 
 Then File → Export → File Format: Application to save it as a double-click "Clear Dock" app you can reuse across your executive fleet.
