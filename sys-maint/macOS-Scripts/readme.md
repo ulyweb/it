@@ -79,22 +79,22 @@ do shell script "killall Dock"
 ---
 
 
-Absolutely — here's a **Script Editor app with a selection menu** that lets you (or any tech) pick between the two actions at runtime: apply the **full 12-app standardized set**, or **fully reset the Dock to factory defaults**. 🎯
+Here's a **Script Editor app with a selection menu** that lets you (or any tech) pick between the two actions at runtime: apply the **full 12-app standardized set**, or **fully reset the Dock to factory defaults**. 🎯
 
 ## 🎛️ Script Editor Version — Interactive Chooser
 
-Open **Script Editor** → new document → paste the script below → **File → Export → File Format: Application** (save as `Standardize-Exec-Dock` in `/Users/Shared`):
+Open **Script Editor** → new document → paste the script below → **File → Export → File Format: Application** (save as `Standardize-Dock` in `/Users/Shared`):
 
 ```applescript
 -- ============================================================
---  Standardize Executive Dock — Interactive Chooser
+--  Standardize Dock — Interactive Chooser
 --  Option 1: Apply full 12-app standardized set
 --  Option 2: Fully reset Dock to macOS factory defaults
 -- ============================================================
 
 set appList to {"/Applications/Safari.app", "/Applications/Google Chrome.app", "/Applications/zoom.us.app", "/Applications/Box.app", "/Applications/Microsoft Outlook.app", "/Applications/Microsoft Word.app", "/Applications/Microsoft Excel.app", "/Applications/Microsoft PowerPoint.app", "/Applications/Self Service.app", "/Applications/Personal Print Manager.app", "/Applications/GlobalProtect.app", "/System/Applications/Utilities/Activity Monitor.app"}
 
-set actionChoice to choose from list {"Apply Full 12-App Standardized Set", "Fully Reset Dock to Factory Defaults"} with title "Standardize Executive Dock" with prompt "Select the Dock action to perform:" default items {"Apply Full 12-App Standardized Set"} without empty selection allowed
+set actionChoice to choose from list {"Apply Full 12-App Standardized Set", "Fully Reset Dock to Factory Defaults"} with title "Standardize Dock" with prompt "Select the Dock action to perform:" default items {"Apply Full 12-App Standardized Set"} without empty selection allowed
 
 if actionChoice is false then
 	-- User clicked Cancel
