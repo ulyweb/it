@@ -103,16 +103,16 @@ end if
 
 set choice to item 1 of actionChoice
 
-if choice is "Apply Full 12-App Standardized Set" then
+if choice is "Core Standard Dock App" then
 	-- Clear the app side, then pin the approved 12-app set
 	do shell script "defaults write com.apple.dock persistent-apps -array"
 	repeat with a in appList
 		do shell script "defaults write com.apple.dock persistent-apps -array-add '<dict><key>tile-data</key><dict><key>file-data</key><dict><key>_CFURLString</key><string>" & a & "</string><key>_CFURLStringType</key><integer>0</integer></dict></dict></dict>'"
 	end repeat
 	do shell script "killall Dock"
-	display notification "12-app standardized Dock applied." with title "Standardize Executive Dock" subtitle "Complete"
+	display notification "12-app standardized Dock applied." with title "Standardize Corp Dock" subtitle "Complete"
 	
-else if choice is "Fully Reset Dock to Factory Defaults" then
+else if choice is "Fully Reset Mac's Dock to Factory Defaults" then
 	-- Wipe all custom Dock settings; macOS regenerates factory defaults
 	do shell script "defaults delete com.apple.dock; killall Dock"
 	display notification "Dock reset to macOS factory defaults." with title "Standardize Executive Dock" subtitle "Complete"
