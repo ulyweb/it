@@ -75,3 +75,55 @@ end repeat
 do shell script "killall Dock"
 ```
 
+
+---
+
+
+Absolutely — here's a **Script Editor app with a selection menu** that lets you (or any tech) pick between the two actions at runtime: apply the **full 12-app standardized set**, or **fully reset the Dock to factory defaults**. 🎯
+
+## 🎛️ Script Editor Version — Interactive Chooser
+
+Open **Script Editor** → new document → paste the script below → **File → Export → File Format: Application** (save as `Standardize-Exec-Dock` in `/Users/Shared`):
+
+```applescript
+-- ============================================================
+--  Standardize Executive Dock — Interactive Chooser
+--  Option 1: Apply full 12-app standardized set
+--  Option 2: Fully reset Dock to macOS factory defaults
+-- ============================================================
+
+set appList to {"/Applications/Safari.app", "/Applications/Google Chrome.app", "/Applications/zoom.us.app", "/Applications/Box.app", "/Applications/Microsoft Outlook.app", "/Applications/Microsoft Word.app", "/Applications/Microsoft Excel.app", "/Applications/Microsoft PowerPoint.app", "/Applications/Self Service.app", "/Applications/Personal Print Manager.app", "/Applications/GlobalProtect.app", "/System/Applications/Utilities/Activity Monitor.app"}
+
+set actionChoice to choose from list {"Apply Full 12-App Standardized Set", "Fully Reset Dock to Factory Defaults"} with title "Standardize Executive Dock" with prompt "Select the Dock action to perform:" default items {"Apply Full 12-App Standardized Set"} without empty selection allowed
+
+if actionChoice is false then
+	-- User clicked Cancel
+	return
+end if
+
+set choice to item 1 of actionChoice
+
+if choice is "Apply Full 12-App Standardized Set" then
+	-- Clear the app side, then pin the approved 12-app set
+	do shell script "defaults write com.apple.dock persistent-apps -array"
+	repeat with a in appList
+		do shell script "defaults write com.apple.dock persistent-apps -array-add '<dict><key>tile-data</key><dict><key>file-data</key><dict><key>_CFURLString</key><string>" & a & "</string><key>_CFURLStringType</key><integer>0</integer></dict></dict></dict>'"
+	end repeat
+	do shell script "killall Dock"
+	display notification "12-app standardized Dock applied." with title "Standardize Executive Dock" subtitle "Complete"
+	
+else if choice is "Fully Reset Dock to Factory Defaults" then
+	-- Wipe all custom Dock settings; macOS regenerates factory defaults
+	do shell script "defaults delete com.apple.dock; killall Dock"
+	display notification "Dock reset to macOS factory defaults." with title "Standardize Executive Dock" subtitle "Complete"
+end if
+```
+
+## 📝 How It Works
+
+* On launch it shows a **`choose from list`** dialog with two clear options and a confirmation notification when done. 🖱️
+* **Option 1 – Apply Full 12-App Set:** empties the app side, then pins your approved 12 apps in the logical order (browsers → comms/storage → Office → IT utilities → system monitor). 
+* **Option 2 – Factory Reset:** runs `defaults delete com.apple.dock; killall Dock`, which wipes all custom Dock settings and lets macOS regenerate the original factory layout, size, magnification, and position. 
+* **Cancel** exits cleanly with no changes.
+
+
