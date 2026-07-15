@@ -76,3 +76,46 @@ do shell script "killall Dock"
 ```
 
 
+---
+
+
+Perfect — let's fold in **Google Chrome, Self Service, Personal Print Manager, and GlobalProtect** so you get the complete standardized executive Dock in one shot. 👇
+
+## ✅ One-Liner — Full Core App Set (native `defaults`, clear + rebuild)
+
+```bash
+defaults write com.apple.dock persistent-apps -array; for app in "/Applications/zoom.us.app" "/Applications/Box.app" "/Applications/Microsoft Outlook.app" "/Applications/Microsoft Word.app" "/Applications/Microsoft Excel.app" "/Applications/Microsoft PowerPoint.app" "/Applications/Google Chrome.app" "/Applications/Self Service.app" "/Applications/Personal Print Manager.app" "/Applications/GlobalProtect.app"; do defaults write com.apple.dock persistent-apps -array-add "<dict><key>tile-data</key><dict><key>file-data</key><dict><key>_CFURLString</key><string>$app</string><key>_CFURLStringType</key><integer>0</integer></dict></dict></dict>"; done; killall Dock
+```
+
+This empties the Dock's app side, then pins all **10 apps** in order and restarts the Dock so they appear immediately. [\[discussion....apple.com\]](https://discussions.apple.com/thread/254797028), [\[discussion....apple.com\]](https://discussions.apple.com/thread/254332755)
+
+## 📝 Verify Paths First (these 4 are the usual troublemakers)
+
+```bash
+ls -d "/Applications/Google Chrome.app" "/Applications/Self Service.app" "/Applications/Personal Print Manager.app" "/Applications/GlobalProtect.app"
+```
+
+Common fleet gotchas:
+
+* **Self Service (Jamf)** → normally `/Applications/Self Service.app` — but some deployments name it `Self Service+.app`
+* **GlobalProtect** → usually `/Applications/GlobalProtect.app` (occasionally lives under a vendor subfolder)
+* **Personal Print Manager (LRS)** → confirm the exact bundle name; sometimes it's `Personal Print Manager.app` and sometimes shortened
+* **Google Chrome** → `Google Chrome.app` (with the space)
+
+If any path comes back "No such file," fix the name before running the pin command or that one icon will silently skip.
+
+## 🎨 Script Editor Version (clickable "Standardize Executive Dock" app)
+
+Open **Script Editor** → new document → paste → **File → Export → File Format: Application**:
+
+```applescript
+set appList to {"/Applications/zoom.us.app", "/Applications/Box.app", "/Applications/Microsoft Outlook.app", "/Applications/Microsoft Word.app", "/Applications/Microsoft Excel.app", "/Applications/Microsoft PowerPoint.app", "/Applications/Google Chrome.app", "/Applications/Self Service.app", "/Applications/Personal Print Manager.app", "/Applications/GlobalProtect.app"}
+do shell script "defaults write com.apple.dock persistent-apps -array"
+repeat with a in appList
+	do shell script "defaults write com.apple.dock persistent-apps -array-add '<dict><key>tile-data</key><dict><key>file-data</key><dict><key>_CFURLString</key><string>" & a & "</string><key>_CFURLStringType</key><integer>0</integer></dict></dict></dict>'"
+end repeat
+do shell script "killall Dock"
+```
+
+
+
