@@ -18,7 +18,7 @@ Open **Script Editor** → paste → **File → Export → File Format: Applicat
 -- ============================================================
 --  Standardize Dock
 --  Version : 1.0
---  Author  : IT Support
+--  Author  : ulyweb
 --  Date    : 2026-07-15
 --  Purpose : Apply a standard core-app Dock, factory-reset the
 --            Dock, or restore a previous Dock from backup.
