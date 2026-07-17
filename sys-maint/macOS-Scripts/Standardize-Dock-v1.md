@@ -165,6 +165,4 @@ end if
 | **Summary dialog**    | Clear end-of-run report: applied / skipped / backup / log paths                    |
 | **Error handling**    | `try` blocks keep one bad path from halting the run                                |
 
-The factory-reset path still uses the standard `defaults delete com.apple.dock; killall Dock` so macOS regenerates its original layout. [\[idownloadblog.com\]](https://www.idownloadblog.com/2023/05/23/how-to-reset-mac-dock/), [\[discussion....apple.com\]](https://discussions.apple.com/thread/254797028)
-
-
+The factory-reset path still uses the standard `defaults delete com.apple.dock; killall Dock` so macOS regenerates its original layout.
