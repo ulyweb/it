@@ -1,5 +1,3 @@
-Full production-grade script that implements all of them. 🛠️
-
 ## 💡 Recommended Professional Enhancements
 
 * **Pre-flight path validation** — check each app exists *before* pinning, skip missing ones gracefully, and report them so you never get silent skips or `?` placeholders. ✅
