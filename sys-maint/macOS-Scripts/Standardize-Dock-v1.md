@@ -1,4 +1,4 @@
-Here are my recommendations, then a full production-grade script that implements all of them. 🛠️
+Full production-grade script that implements all of them. 🛠️
 
 ## 💡 Recommended Professional Enhancements
 
