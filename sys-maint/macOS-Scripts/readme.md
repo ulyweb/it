@@ -127,3 +127,21 @@ end if
 * **Cancel** exits cleanly with no changes.
 
 
+
+---
+
+## macOS Terminal Mapping Network
+
+
+* Map Network
+```
+mkdir -p ~/Desktop/files
+
+mount_smbfs //username@domain.com/files/archive/scripts ~/Desktop/files
+```
+
+* Un-Map Network 
+
+```
+umount ~/Desktop/files
+```
